@@ -31,9 +31,6 @@ var simplemde = new SimpleMDE({
 });
 
 function insertImage(el) {
-  let self = this;
-  console.log(simplemde);
-
   let inputEle = document.createElement('input');
   inputEle.setAttribute('type', 'file');
   inputEle.setAttribute('accept', 'image/*');
@@ -41,20 +38,15 @@ function insertImage(el) {
 
   inputEle.onchange = (e) => {
     var file = e.target.files[0];
-
     var reader = new FileReader();
     reader.readAsDataURL(file);
   
     reader.onload = function() {
         var line = simplemde.codemirror.getCursor().line;
         var ch = simplemde.codemirror.getCursor().ch;
-
         var dataUri = reader.result;
-        let cm = simplemde.codemirror;
-        let stat = simplemde.getState();
-        let options = simplemde.options;
-
-        simplemde.codemirror.replaceSelection(cm, stat.iamge,options.insertTexts.image, dataUri)
+        var text = "![](" + dataUri + ")";
+        simplemde.codemirror.replaceRange(text,{line:line,ch:ch},{line:line,ch:ch});
     }
   }
 }

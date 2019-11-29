@@ -4,37 +4,12 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
-var simplemde = new SimpleMDE({
-  	toolbar: [{
-			name: "image",
-			action: insertImage,
-			className: "fa fa-picture-o",
-			title: "画像挿入"
-		},
-    '|',
-    'bold',
-    'italic',
-    'heading',
-    '|',
-    'quote',
-    'unordered-list',
-    'ordered-list',
-    '|',
-    'link',
-    '|',
-    'preview',
-    'side-by-side',
-    'fullscreen',
-    '|',
-    'guide',
-    ]
-});
-
 function insertImage(el) {
   let inputEle = document.createElement('input');
   inputEle.setAttribute('type', 'file');
   inputEle.setAttribute('accept', 'image/*');
   inputEle.click();
+  console.log(inputEle);
 
   inputEle.onchange = (e) => {
     let file = e.target.files[0];
@@ -42,20 +17,47 @@ function insertImage(el) {
     reader.readAsDataURL(file);
   
     reader.onload = function() {
-        let line = simplemde.codemirror.getCursor().line;
-        let ch = simplemde.codemirror.getCursor().ch;
-        let dataUri = reader.result;
-        let text = "![](" + dataUri + ")";
-        simplemde.codemirror.replaceRange(text,{line:line,ch:ch},{line:line,ch:ch});
+      let line = simplemde.codemirror.getCursor().line;
+      let ch = simplemde.codemirror.getCursor().ch;
+      let dataUri = reader.result;
+      let text = "![](" + dataUri + ")";
+      simplemde.codemirror.replaceRange(text,{line:line,ch:ch},{line:line,ch:ch});
     }
   }
 }
+
+var simplemde = new SimpleMDE({
+  toolbar: [{
+    name: "image",
+    action: insertImage,
+    className: "fa fa-picture-o",
+    title: "画像挿入"
+  },
+  '|',
+  'bold',
+  'italic',
+  'heading',
+  '|',
+  'quote',
+  'unordered-list',
+  'ordered-list',
+  '|',
+  'link',
+  '|',
+  'preview',
+  'side-by-side',
+  'fullscreen',
+  '|',
+  'guide',
+  ]
+});
 </script>
 
 
 <div id="marked"></div>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    document.getElementById('marked').innerHTML =
-      marked('# Marked in the browser\n\nRendered by **marked**.');
+    simplemde.codemirror.on('change', () => {
+      document.getElementById('marked').innerHTML = marked(simplemde.value());
+    });
   </script>

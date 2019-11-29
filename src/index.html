@@ -37,15 +37,15 @@ function insertImage(el) {
   inputEle.click();
 
   inputEle.onchange = (e) => {
-    var file = e.target.files[0];
-    var reader = new FileReader();
+    let file = e.target.files[0];
+    let reader = new FileReader();
     reader.readAsDataURL(file);
   
     reader.onload = function() {
-        var line = simplemde.codemirror.getCursor().line;
-        var ch = simplemde.codemirror.getCursor().ch;
-        var dataUri = reader.result;
-        var text = "![](" + dataUri + ")";
+        let line = simplemde.codemirror.getCursor().line;
+        let ch = simplemde.codemirror.getCursor().ch;
+        let dataUri = reader.result;
+        let text = "![](" + dataUri + ")";
         simplemde.codemirror.replaceRange(text,{line:line,ch:ch},{line:line,ch:ch});
     }
   }

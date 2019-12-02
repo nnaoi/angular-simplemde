@@ -3,71 +3,101 @@
 <textarea id="MyID"></textarea>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <style type="text/css">
-.editor-preview strong,
-.cm-strong,
-#marked strong
- {
-   font-weight: 900;
-   color: #000066;
-}
+  .hoge-h1 {
+    color: #ff7f7f;
+  }
+
+  .hoge-h2 {
+    color: #7f7fff;
+  }
+
+  /* .cm-header-1 {
+    color: #ff7f7f;
+  }
+
+  .cm-header-2 {
+    color: #7f7fff;
+  } */
 </style>
 
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
-function insertImage(el) {
-  let inputEle = document.createElement('input');
-  inputEle.setAttribute('type', 'file');
-  inputEle.setAttribute('accept', 'image/*');
-  inputEle.click();
-  console.log(inputEle);
+  function insertImage(el) {
+    let inputEle = document.createElement('input');
+    inputEle.setAttribute('type', 'file');
+    inputEle.setAttribute('accept', 'image/*');
+    inputEle.click();
+    console.log(inputEle);
 
-  inputEle.onchange = (e) => {
-    let file = e.target.files[0];
-    let reader = new FileReader();
-    reader.readAsDataURL(file);
-  
-    reader.onload = function() {
-      let line = simplemde.codemirror.getCursor().line;
-      let ch = simplemde.codemirror.getCursor().ch;
-      let dataUri = reader.result;
-      let text = "![](" + dataUri + ")";
-      simplemde.codemirror.replaceRange(text,{line:line,ch:ch},{line:line,ch:ch});
+    inputEle.onchange = (e) => {
+      let file = e.target.files[0];
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+    
+      reader.onload = function() {
+        let line = simplemde.codemirror.getCursor().line;
+        let ch = simplemde.codemirror.getCursor().ch;
+        let dataUri = reader.result;
+        let text = "![](" + dataUri + ")";
+        simplemde.codemirror.replaceRange(text,{line:line,ch:ch},{line:line,ch:ch});
+      }
     }
   }
-}
 
-var simplemde = new SimpleMDE({
-  toolbar: [{
-    name: "image",
-    action: insertImage,
-    className: "fa fa-picture-o",
-    title: "画像挿入"
-  },
-  '|',
-  'bold',
-  'italic',
-  'heading',
-  '|',
-  'quote',
-  'unordered-list',
-  'ordered-list',
-  '|',
-  'link',
-  '|',
-  'preview',
-  'side-by-side',
-  'fullscreen',
-  '|',
-  'guide',
-  ]
-});
+  var simplemde = new SimpleMDE({
+    previewRender: function(plainText, preview) {
+      preview.innerHTML = this.parent.markdown(plainText);
+
+      let h1s = preview.getElementsByTagName('h1');
+      Array.prototype.forEach.call(h1s, function(element) {
+        element.classList.add('hoge-h1');
+        // element.style.textShadow = "5px 5px 5px #343434"
+      });
+      
+      let h2s = preview.getElementsByTagName('h2');
+      Array.prototype.forEach.call(h2s, function(element) {
+        element.classList.add('hoge-h2');
+      });
+      
+      return preview.innerHTML;
+    },
+    toolbar: [{
+      name: "image",
+      action: insertImage,
+      className: "fa fa-picture-o",
+      title: "画像挿入"
+    },
+    '|',
+    'bold',
+    'italic',
+    'heading',
+    '|',
+    'quote',
+    'unordered-list',
+    'ordered-list',
+    '|',
+    'link',
+    '|',
+    'preview',
+    'side-by-side',
+    'fullscreen',
+    '|',
+    'guide',
+    ],
+  });
 </script>
 
-
 <div id="marked"></div>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script>
-    simplemde.codemirror.on('change', () => {
-      document.getElementById('marked').innerHTML = marked(simplemde.value());
-    });
-  </script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  var renderer = new marked.Renderer();
+
+  renderer.heading = function(text, level) {
+    return '<h' + level + ' class="hoge-h' + level + '">' +
+      text + '</h' + level + '>';
+  }
+
+  simplemde.codemirror.on('change', () => {
+    document.getElementById('marked').innerHTML = marked(simplemde.value() ,{ renderer: renderer });
+  });
+</script>
